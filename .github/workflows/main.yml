@@ -24,59 +24,33 @@ jobs:
         pip install --no-cache-dir -r requirements.txt
         pip install pyinstaller
 
-    # Step 4: Fetch the latest tag (if exists) and compute next version
-    - name: Get the latest tag and compute next version
-      id: version
+    # Step 4: Debug directory structure to confirm app.py exists
+    - name: Debug repository structure
       run: |
-        VERSION=$(git describe --tags --abbrev=0 || echo "v1.0.0")
-        echo "Current version: $VERSION"
-        
-        # Extract MAJOR, MINOR, PATCH from the version (e.g., v1.2.3)
-        VERSION_NUMBER=${VERSION//v/}  # Remove 'v' prefix
-        MAJOR=$(echo $VERSION_NUMBER | cut -d. -f1)
-        MINOR=$(echo $VERSION_NUMBER | cut -d. -f2)
-        PATCH=$(echo $VERSION_NUMBER | cut -d. -f3)
-        
-        # Increment PATCH version
-        NEW_PATCH=$((PATCH + 1))
-        NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
-        
-        echo "New version: $NEW_VERSION"
-        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV  # Store new version for later steps
+        echo "Current Working Directory:"
+        pwd
+        echo "Repository Structure:"
+        ls -R .
 
     # Step 5: Build the executable
     - name: Build LeadgerDesktop executable
       run: |
-        EXECUTABLE_NAME="LeadgerDesktop-${NEW_VERSION}"
-        pyinstaller --onefile --name=${EXECUTABLE_NAME} --noconsole \
+        pyinstaller --onefile --name=LeadgerDesktop.1.$(date +'%Y%m%d%H%M%S') --noconsole \
         --add-data "templates:templates" \
         --add-data "instance:instance" \
         --icon=LeadgerApp/icon.ico app.py
         cp -r instance dist/instance
-        mv dist "${EXECUTABLE_NAME}"  # Rename dist to versioned package name
+        mv dist   LeadgerDesktop_$(date +'%Y%m%d%H%M%S') # Rename dist to package_timestamp
         
-    # Step 6: Compress the folder to .zip
-    - name: Compress build folder into a .zip file
-      run: |
-        EXECUTABLE_NAME="LeadgerDesktop-${NEW_VERSION}"
-        echo "Zipping folder: ${EXECUTABLE_NAME}"
-        zip -r "${EXECUTABLE_NAME}.zip" "${EXECUTABLE_NAME}"
-        
-    # Step 7: Create a release and upload the .zip file
-    - name: Upload release asset
+  
+
+    # Optional Step 7: Push the executable back to the repository (if needed)
+    - name: Commit and push executable
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        EXECUTABLE_NAME="LeadgerDesktop-${NEW_VERSION}"
-        curl -XPOST -H "Authorization: token $GITHUB_TOKEN" \
-          -d '{"tag_name": "'${NEW_VERSION}'", "name": "'${NEW_VERSION}'", "body": "Automated release"}' \
-          "https://api.github.com/repos/${{ github.repository }}/releases"
-        
-        # Upload the .zip file as release asset
-        RELEASE_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-          "https://api.github.com/repos/${{ github.repository }}/releases/tags/${NEW_VERSION}" | jq .id)
-
-        curl -XPOST -H "Authorization: token $GITHUB_TOKEN" \
-          -H "Content-Type: application/zip" \
-          --data-binary @"${EXECUTABLE_NAME}.zip" \
-          "https://uploads.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID/assets?name=${EXECUTABLE_NAME}.zip"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add LeadgerDesktop_$(date +'%Y%m%d%H%M%S')/*
+        git commit -m "Build and Package LeadgerApp: Added ${EXECUTABLE_NAME} executable"
+        git push "https://${GITHUB_TOKEN}@github.com/prasad3936/LeadgerApp.git" HEAD:main

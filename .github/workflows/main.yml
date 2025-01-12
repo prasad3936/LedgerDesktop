@@ -33,14 +33,16 @@ jobs:
         ls -R .
 
     # Step 5: Build the executable
-    - name: Build LeaderDesktop executable
+    - name: Build LeadgerDesktop executable
       run: |
         pyinstaller --onefile --name=LeadgerDesktop.1.$(date +'%Y%m%d%H%M%S') --noconsole \
         --add-data "templates:templates" \
         --add-data "instance:instance" \
         --icon=LeadgerApp/icon.ico app.py
         cp -r instance dist/instance
-        mv dist LeaderDesktop_$(date +'%Y%m%d%H%M%S') # Rename dist to package_timestamp
+        mv dist LeadgerDesktop_$(date +'%Y%m%d%H%M%S') # Rename dist to package_timestamp
+        # Save the executable name for future reference
+        echo "EXECUTABLE_NAME=LeadgerDesktop_$(date +'%Y%m%d%H%M%S)/LeadgerDesktop.1.$(date +'%Y%m%d%H%M%S').exe" >> $GITHUB_ENV
 
     # Step 6: Zip the LeaderDesktop folder
     - name: Zip the LeaderDesktop folder
@@ -57,12 +59,15 @@ jobs:
         RELEASE_TAG=$(date +'%Y%m%d%H%M%S')
 
         # Create a GitHub release using the GitHub API
-        curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+        RELEASE_RESPONSE=$(curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
         -d "{\"tag_name\": \"$RELEASE_TAG\", \"name\": \"Release $RELEASE_TAG\", \"body\": \"Release of LeadgerDesktop executable.\"}" \
-        https://api.github.com/repos/prasad3936/LedgerDesktop/releases
+        https://api.github.com/repos/prasad3936/LedgerDesktop/releases)
+
+        # Extract the release ID from the response
+        RELEASE_ID=$(echo $RELEASE_RESPONSE | jq -r .id)
 
         # Upload the zip file as an asset to the release
         curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
         -H "Content-Type: application/zip" \
         --data-binary @LeaderDesktop_${RELEASE_TAG}.zip \
-        https://uploads.github.com/repos/prasad3936/LedgerDesktop/releases/${RELEASE_TAG}/assets?name=LeaderDesktop_${RELEASE_TAG}.zip
+        https://uploads.github.com/repos/prasad3936/LedgerDesktop/releases/$RELEASE_ID/assets?name=LeaderDesktop_${RELEASE_TAG}.zip

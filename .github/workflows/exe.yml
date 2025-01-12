@@ -29,16 +29,21 @@ jobs:
     # Step 4: Build the executable
     - name: Build LeadgerDesktop executable
       run: |
-        pyinstaller --onefile --name=LeadgerDesktop.1.$(date +'%Y%m%d%H%M%S') --noconsole \
+        # Create a timestamp for the build
+        TIMESTAMP=$(date +'%Y%m%d%H%M%S')
+        
+        # Build the executable
+        pyinstaller --onefile --name=LeadgerDesktop.1.${TIMESTAMP} --noconsole \
         --add-data "templates:templates" \
         --add-data "instance:instance" \
         --icon=LeadgerApp/icon.ico app.py
-        cp -r instance dist/instance
-        mv dist LeadgerDesktop_$(date +'%Y%m%d%H%M%S') # Rename dist to package_timestamp
 
-    # Step 5: Upload the `.exe` as an artifact
+        # Move and rename the dist folder
+        mv dist LeadgerDesktop_${TIMESTAMP}
+
+    # Step 5: Upload the `.exe` as artifact
     - name: Upload executable as artifact
       uses: actions/upload-artifact@v3
       with:
         name: LeadgerDesktop-executable
-        path: LeadgerDesktop_$(date +'%Y%m%d%H%M%S')/LeadgerDesktop.1.$(date +'%Y%m%d%H%M%S').exe
+        path: LeadgerDesktop_${TIMESTAMP}/LeadgerDesktop.1.${TIMESTAMP}.exe

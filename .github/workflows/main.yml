@@ -33,24 +33,36 @@ jobs:
         ls -R .
 
     # Step 5: Build the executable
-    - name: Build LeadgerDesktop executable
+    - name: Build LeaderDesktop executable
       run: |
         pyinstaller --onefile --name=LeadgerDesktop.1.$(date +'%Y%m%d%H%M%S') --noconsole \
         --add-data "templates:templates" \
         --add-data "instance:instance" \
         --icon=LeadgerApp/icon.ico app.py
         cp -r instance dist/instance
-        mv dist   LeadgerDesktop_$(date +'%Y%m%d%H%M%S') # Rename dist to package_timestamp
-        
-  
+        mv dist LeaderDesktop_$(date +'%Y%m%d%H%M%S') # Rename dist to package_timestamp
 
-    # Optional Step 7: Push the executable back to the repository (if needed)
-    - name: Commit and push executable
+    # Step 6: Zip the LeaderDesktop folder
+    - name: Zip the LeaderDesktop folder
+      run: |
+        cd LeadgerDesktop_$(date +'%Y%m%d%H%M%S')
+        zip -r ../LeaderDesktop_$(date +'%Y%m%d%H%M%S').zip .
+
+    # Step 7: Create a GitHub release and upload the .zip file
+    - name: Create GitHub Release and upload the zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add LeadgerDesktop_$(date +'%Y%m%d%H%M%S')/*
-        git commit -m "Build and Package LeadgerApp: Added ${EXECUTABLE_NAME} executable"
-        git push "https://${GITHUB_TOKEN}@github.com/prasad3936/LedgerDesktop.git" HEAD:main
+        # Get the current date for the release tag
+        RELEASE_TAG=$(date +'%Y%m%d%H%M%S')
+
+        # Create a GitHub release using the GitHub API
+        curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+        -d "{\"tag_name\": \"$RELEASE_TAG\", \"name\": \"Release $RELEASE_TAG\", \"body\": \"Release of LeadgerDesktop executable.\"}" \
+        https://api.github.com/repos/prasad3936/LedgerDesktop/releases
+
+        # Upload the zip file as an asset to the release
+        curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+        -H "Content-Type: application/zip" \
+        --data-binary @LeaderDesktop_${RELEASE_TAG}.zip \
+        https://uploads.github.com/repos/prasad3936/LedgerDesktop/releases/${RELEASE_TAG}/assets?name=LeaderDesktop_${RELEASE_TAG}.zip

@@ -12,9 +12,9 @@ app = Flask(__name__)
 # Secret key for session management (must be set early in the app initialization)
 app.secret_key = os.urandom(24)  # Generates a random secret key
 # Configuration for SQLite Database
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://ledger_user:strongpassword123@localhost/ledger_db"
+#app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://ledger_user:strongpassword123@localhost/ledger_db"
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///customer_db.sqlite'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///customer_db.sqlite'
 #app.config['SQLALCHEMY_DATABASE_URI'] = (
  #   "mysql+pymysql://avnadmin:AVNS_Rt3kVJGJry4vPpm2fd0@mysql-1f761a7d-prasadcpatil246-f8f0.b.aivencloud.com:14627/leadgerdb"
 #)

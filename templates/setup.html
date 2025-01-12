@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Legder - A Customer Management</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
+
+    <style>
+      /* Hide elements not needed in print view */
+      @media print {
+        .no-print {
+          display: none;
+        }
+      }
+
+      /* Copyright notice styling */
+      .copyright {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        font-size: 0.9rem;
+        color: #555;
+      }
+
+      /* Custom styles for the action buttons section */
+      .actions {
+        display: flex;
+        gap: 15px; /* Add space between buttons */
+        justify-content: start;
+        margin-top: 10px;
+      }
+
+      .actions .btn {
+        width: auto;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      .actions .btn-sm {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+      }
+
+      /* Improve form and button spacing */
+      .actions form {
+        display: inline-block;
+        margin-right: 10px;
+      }
+      .actions .form-control {
+        display: inline-block;
+        width: auto;
+        max-width: 100px; /* Limiting width of the input fields */
+      }
+
+      /* Center the form elements */
+      .form-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f7f7f7;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-container h2 {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-4">
+      <h1 class="text-center">Kiran Pharmaceuticals</h1>
+      <div class="d-flex justify-content-between mb-3 no-print"></div>
+      <div class="form-container">
+        <h2>Setup Account</h2>
+        <form method="POST" action="/setup">
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              name="username"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="confirm_password" class="form-label"
+              >Confirm Password</label
+            >
+            <input
+              type="password"
+              class="form-control"
+              id="confirm_password"
+              name="confirm_password"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            Setup Account
+          </button>
+        </form>
+      </div>
+      <div class="text-center mt-3">
+        <a href="{{ url_for('login') }}" class="btn btn-secondary">Login</a>
+      </div>
+    </div>
+    <div class="copyright">
+      &copy; 2024 By Ledger For Kiran Pharmaceuticals. All rights reserved.
+    </div>
+  </body>
+</html>

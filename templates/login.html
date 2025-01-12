@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ledger - Login</title>
+
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      /* Hide elements not needed in print view */
+      @media print {
+        .no-print {
+          display: none;
+        }
+      }
+
+      /* Copyright notice styling */
+      .copyright {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        font-size: 0.9rem;
+        color: #555;
+      }
+
+      /* Center the form elements */
+      .form-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #bfbbbb;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-container h2 {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-4">
+      <h1 class="text-center">Kiran Pharmaceuticals</h1>
+      <div class="form-container">
+        <h2>Login</h2>
+        <form method="POST" action="/login">
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              name="username"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
+      </div>
+      <div class="text-center mt-3">
+        <a href="{{ url_for('setup') }}" class="btn btn-secondary"
+          >Setup Account</a
+        >
+      </div>
+    </div>
+    <div class="copyright">
+      &copy; 2024 By Ledger For Kiran Pharmaceuticals. All rights reserved.
+    </div>
+  </body>
+</html>

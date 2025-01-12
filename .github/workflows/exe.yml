@@ -1,0 +1,44 @@
+name: Build Executable
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Check out the repository
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Python environment
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      run: |
+        pip install --no-cache-dir -r requirements.txt
+        pip install pyinstaller
+
+    # Step 4: Build the executable
+    - name: Build LeadgerDesktop executable
+      run: |
+        pyinstaller --onefile --name=LeadgerDesktop.1.$(date +'%Y%m%d%H%M%S') --noconsole \
+        --add-data "templates:templates" \
+        --add-data "instance:instance" \
+        --icon=LeadgerApp/icon.ico app.py
+        cp -r instance dist/instance
+        mv dist LeadgerDesktop_$(date +'%Y%m%d%H%M%S') # Rename dist to package_timestamp
+
+    # Step 5: Upload the `.exe` as an artifact
+    - name: Upload executable as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: LeadgerDesktop-executable
+        path: LeadgerDesktop_$(date +'%Y%m%d%H%M%S')/LeadgerDesktop.1.$(date +'%Y%m%d%H%M%S').exe
